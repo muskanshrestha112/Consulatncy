@@ -182,7 +182,7 @@ export default function HomePage() {
                   setCourse(e.target.value);
                   setShowSuggestions(true);
                 }}
-                className="px-4 py-2 rounded-xl w-full sm:w-70 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                className="px-4 py-2 rounded-xl w-full sm:w-80 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
               />
               {showSuggestions && course && filteredSuggestions.length > 0 && (
                 <div className="absolute top-full left-0 mt-2 w-full sm:w-62 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-20">
@@ -221,51 +221,84 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Search Results + Single Ad Section */}
-      <section className="w-full py-10 flex flex-col sm:flex-row gap-10 justify-between px-6 sm:px-10">
-        {/* Results Section */}
-        <div className="flex-1">
-          {results.length > 0 ? (
-            <ul className="flex flex-col w-full max-w-2xl space-y-4">
-              {results.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition"
-                >
-                  <img
-                    src={item.logo}
-                    alt={item.name}
-                    className="w-16 h-16 object-contain rounded-md"
-                  />
-                  <div className="flex flex-col text-left flex-1">
-                    <p className="font-semibold text-gray-900 text-lg">{item.name}</p>
-                    <p className="text-gray-700 text-sm mb-1">
-                      {item.course} Course - {item.country}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-4 text-gray-500 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Icon icon="mdi:map-marker-outline" className="text-gray-400 text-base" />
-                        {item.address}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Icon icon="mdi:email-outline" className="text-gray-400 text-base" />
-                        {item.email}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Icon icon="mdi:phone-outline" className="text-gray-400 text-base" />
-                        {item.phone}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 font-semibold text-lg text-left">
-              Search Result.
-            </p>
-          )}
-        </div>
+    {/* Search Results + Single Ad Section */}
+<section className="w-full py-10 flex flex-col sm:flex-row gap-10 justify-between px-6 sm:px-10">
+  {/* Results Section */}
+  <div className="flex-1">
+    {results.length > 0 ? (
+      <ul className="flex flex-col w-full max-w-2xl space-y-4">
+        {results.map((item, index) => (
+          <li
+            key={index}
+            className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition"
+          >
+            <img
+              src={item.logo}
+              alt={item.name}
+              className="w-16 h-16 object-contain rounded-md"
+            />
+            <div className="flex flex-col text-left flex-1">
+              <p className="font-semibold text-gray-900 text-lg">{item.name}</p>
+              <p className="text-gray-700 text-sm mb-1">
+                {item.course} Course - {item.country}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 text-gray-500 text-sm">
+                {/* Address → Google Maps */}
+                <div className="flex items-center gap-1">
+                  <Icon icon="mdi:map-marker-outline" className="text-gray-400 text-base" />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:underline"
+                  >
+                    {item.address}
+                  </a>
+                </div>
+
+                {/* Email → Smart hybrid (Gmail for desktop, mail app for mobile) */}
+                <div className="flex items-center gap-1">
+                  <Icon icon="mdi:email-outline" className="text-gray-400 text-base" />
+             <a
+                href={
+                  /Android|iPhone|iPad/i.test(navigator.userAgent)
+                    ? `googlegmail://co?to=${encodeURIComponent(item.email)}`
+                    : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:underline"
+              >
+                {item.email}
+              </a>
+                </div>
+
+                {/* WhatsApp → Opens chat */}
+                <div className="flex items-center gap-1">
+                  <Icon icon="mdi:phone-outline" className="text-gray-400 text-base" />
+                  <a
+                    href={`https://wa.me/${item.phone.replace(/[^\d]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:underline"
+                  >
+                    {item.phone}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-gray-500 font-semibold text-lg text-left">
+        Search Result.
+      </p>
+    )}
+  </div>
+
+
 
         {/* Website-Style Ad Section */}
           <aside className="w-full sm:w-[460px] bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition overflow-hidden self-start cursor-pointer">
