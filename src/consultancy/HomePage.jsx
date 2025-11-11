@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HeroImage from "../assets/hero-image.jpg";
 import { Icon } from "@iconify/react";
 import adsimg from "../assets/ads.jpg";
+import PopupAd from "../components/PopupAd";
 
 
 // Logos for IT Courses
@@ -120,11 +121,21 @@ export const consultancyData = [
 ];
 
 export default function HomePage() {
+  // Search states
   const [country, setCountry] = useState("");
   const [course, setCourse] = useState("");
   const [results, setResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Popup ad state
+  const [showPopup, setShowPopup] = useState(false);
+
+  // Show popup every time page loads
+  useEffect(() => {
+    setShowPopup(true);
+  }, []);
+
+  // Course autocomplete
   const courseNames = [...new Set(consultancyData.map((item) => item.course))];
   const filteredSuggestions = courseNames.filter((c) =>
     c.toLowerCase().includes(course.toLowerCase())
@@ -146,7 +157,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative">
+      {/* Popup Ad */}
+      {showPopup && <PopupAd onClose={() => setShowPopup(false)} adsimg={adsimg} />}
+
       {/* Hero Section */}
       <section
         className="relative flex flex-col justify-center text-white"
@@ -163,7 +177,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero Text */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-6 pt-16 pb-12">
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 pt-12 pb-20">
           <h1 className="text-4xl sm:text-5xl font-bold mb-6">
             Find the Best Consultancy for Your Course Abroad
           </h1>
@@ -173,6 +187,7 @@ export default function HomePage() {
 
           {/* Search Section */}
           <div className="relative flex flex-col sm:flex-row gap-3 justify-center w-full max-w-3xl sm:justify-end">
+            {/* Course Input */}
             <div className="relative w-full sm:w-auto">
               <input
                 type="text"
@@ -199,6 +214,7 @@ export default function HomePage() {
               )}
             </div>
 
+            {/* Country Select */}
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -211,6 +227,7 @@ export default function HomePage() {
               <option value="USA">USA</option>
             </select>
 
+            {/* Search Button */}
             <button
               onClick={handleSearch}
               className="px-6 py-2 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
@@ -221,115 +238,103 @@ export default function HomePage() {
         </div>
       </section>
 
-    {/* Search Results + Single Ad Section */}
-<section className="w-full py-10 flex flex-col sm:flex-row gap-10 justify-between px-6 sm:px-10">
-  {/* Results Section */}
-  <div className="flex-1">
-    {results.length > 0 ? (
-      <ul className="flex flex-col w-full max-w-2xl space-y-4">
-        {results.map((item, index) => (
-          <li
-            key={index}
-            className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition"
-          >
+      {/* Search Results + Sidebar Ad */}
+      <section className="w-full py-10 flex flex-col sm:flex-row gap-10 justify-between px-6 sm:px-10">
+        {/* Results Section */}
+        <div className="flex-1">
+          {results.length > 0 ? (
+            <ul className="flex flex-col w-full max-w-2xl space-y-4">
+              {results.map((item, index) => (
+                <li
+                  key={index}
+                  className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition"
+                >
+                  <img
+                    src={item.logo}
+                    alt={item.name}
+                    className="w-16 h-16 object-contain rounded-md"
+                  />
+                  <div className="flex flex-col text-left flex-1">
+                    <p className="font-semibold text-gray-900 text-lg">{item.name}</p>
+                    <p className="text-gray-700 text-sm mb-1">
+                      {item.course} Course - {item.country}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-4 text-gray-500 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Icon icon="mdi:map-marker-outline" className="text-gray-400 text-base" />
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-500 hover:underline"
+                        >
+                          {item.address}
+                        </a>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <Icon icon="mdi:email-outline" className="text-gray-400 text-base" />
+                        <a
+                          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-500 hover:underline"
+                        >
+                          {item.email}
+                        </a>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <Icon icon="mdi:phone-outline" className="text-gray-400 text-base" />
+                        <a
+                          href={`https://wa.me/${item.phone.replace(/[^\d]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-500 hover:underline"
+                        >
+                          {item.phone}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 font-semibold text-lg text-left">
+              Search Result.
+            </p>
+          )}
+        </div>
+
+        {/* Sidebar Ad */}
+        <aside className="w-full sm:w-[460px] bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition overflow-hidden self-start cursor-pointer">
+          <div className="overflow-hidden">
             <img
-              src={item.logo}
-              alt={item.name}
-              className="w-16 h-16 object-contain rounded-md"
+              src={adsimg}
+              alt="Study Abroad Ad"
+              className="w-full h-45 object-cover transform transition-transform duration-300 hover:scale-105"
             />
-            <div className="flex flex-col text-left flex-1">
-              <p className="font-semibold text-gray-900 text-lg">{item.name}</p>
-              <p className="text-gray-700 text-sm mb-1">
-                {item.course} Course - {item.country}
-              </p>
+          </div>
 
-              <div className="flex flex-wrap items-center gap-4 text-gray-500 text-sm">
-                {/* Address → Google Maps */}
-                <div className="flex items-center gap-1">
-                  <Icon icon="mdi:map-marker-outline" className="text-gray-400 text-base" />
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:underline"
-                  >
-                    {item.address}
-                  </a>
-                </div>
-
-                {/* Email → Smart hybrid (Gmail for desktop, mail app for mobile) */}
-                <div className="flex items-center gap-1">
-                  <Icon icon="mdi:email-outline" className="text-gray-400 text-base" />
-             <a
-                href={
-                  /Android|iPhone|iPad/i.test(navigator.userAgent)
-                    ? `googlegmail://co?to=${encodeURIComponent(item.email)}`
-                    : `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:underline"
-              >
-                {item.email}
-              </a>
-                </div>
-
-                {/* WhatsApp → Opens chat */}
-                <div className="flex items-center gap-1">
-                  <Icon icon="mdi:phone-outline" className="text-gray-400 text-base" />
-                  <a
-                    href={`https://wa.me/${item.phone.replace(/[^\d]/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:underline"
-                  >
-                    {item.phone}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="text-gray-500 font-semibold text-lg text-left">
-        Search Result.
-      </p>
-    )}
-  </div>
-
-
-
-        {/* Website-Style Ad Section */}
-          <aside className="w-full sm:w-[460px] bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition overflow-hidden self-start cursor-pointer">
-            {/* Ad Image */}
-            <div className="overflow-hidden">
-              <img
-                src= {adsimg}
-                alt="Study Abroad Ad"
-                className="w-full h-45 object-cover transform transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-
-            {/* Ad Content */}
-            <div className="p-3">
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                Study Abroad with Global Scholars 🌍
-              </h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                Apply now for top universities in Australia, Canada, UK, and the USA.
-                Get expert visa guidance and scholarships up to 100%.
-              </p>
-              <button
-                onClick={() => window.open("https://www.globalscholars.com", "_blank")}
-                className="w-full px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
-              >
-                Learn More
-              </button>
-            </div>
-          </aside>
+          <div className="p-3">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Study Abroad with Global Scholars 🌍
+            </h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-3">
+              Apply now for top universities in Australia, Canada, UK, and the USA.
+              Get expert visa guidance and scholarships up to 100%.
+            </p>
+            <button
+              onClick={() => window.open("https://www.globalscholars.com", "_blank")}
+              className="w-full px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
+            >
+              Learn More
+            </button>
+          </div>
+        </aside>
       </section>
     </div>
   );
 }
-
